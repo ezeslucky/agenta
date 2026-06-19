@@ -1,159 +1,239 @@
-# Turborepo starter
+# Agenta
 
-This Turborepo starter is maintained by the Turborepo core team.
+> **The Open-Source Operating System for Human + Agent Teams**
+>
+> Assign work to AI agents like teammates. Track progress, manage execution, and build a workforce that scales beyond humans.
 
-## Using this example
+<p align="center">
+  <img src="docs/assets/banner.jpg" alt="Agenta — Human + Agent Teams" width="100%">
+</p>
 
-Run the following command:
+<p align="center">
+  <a href="https://github.com/ezeslucky/agenta/actions">
+    <img src="https://github.com/ezeslucky/agenta/actions/workflows/ci.yml/badge.svg" alt="CI">
+  </a>
+  <a href="https://github.com/ezeslucky/agenta/stargazers">
+    <img src="https://img.shields.io/github/stars/ezeslucky/agenta?style=flat" alt="Stars">
+  </a>
+</p>
 
-```sh
-npx create-turbo@latest
+<p align="center">
+  <a href="https://agenta.ai">Website</a> •
+  <a href="https://app.agenta.ai">Cloud</a> •
+  <a href="./docs">Documentation</a> •
+  <a href="./SELF_HOSTING.md">Self Hosting</a>
+</p>
+
+---
+
+## Why Agenta?
+
+Software teams are entering a new era.
+
+For decades, work was assigned only to people.
+
+Today, AI agents can write code, review pull requests, fix bugs, deploy infrastructure, answer questions, and execute complex workflows.
+
+The problem is that existing tools were built for human-only teams.
+
+**Agenta changes that.**
+
+Agents become first-class teammates with ownership, responsibilities, execution environments, and reusable skills.
+
+Instead of treating AI as a chat interface, Agenta treats agents as workers that participate directly in your team's workflow.
+
+* Assign issues
+* Track progress
+* Review outcomes
+* Scale execution
+
+All from a single platform.
+
+---
+
+## Features
+
+### 🤖 Agents as Teammates
+
+Assign work to AI agents exactly like human teammates.
+
+Agents have:
+
+* Profiles
+* Ownership
+* Skills
+* Activity history
+* Comments
+* Responsibilities
+
+### 👥 Squads
+
+Create groups of agents and humans under a leader.
+
+Assign work to the squad and let the leader route tasks automatically.
+
+```text
+@FrontendTeam
+@BackendTeam
+@InfrastructureTeam
 ```
 
-## What's inside?
+### ⚡ Autonomous Execution
 
-This Turborepo includes the following packages/apps:
+Complete task lifecycle management:
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```text
+Created
+  ↓
+Assigned
+  ↓
+Claimed
+  ↓
+Running
+  ↓
+Completed
 ```
 
-Without global `turbo`, use your package manager:
+Agents execute work autonomously and continuously report progress.
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+### 🔄 Autopilots
+
+Schedule recurring work:
+
+* Daily standups
+* Weekly reports
+* Dependency updates
+* Security audits
+* Documentation sync
+
+### 🧠 Reusable Skills
+
+Every successful execution becomes reusable knowledge.
+
+Agents learn:
+
+* Deployment workflows
+* Infrastructure operations
+* Code review patterns
+* Team conventions
+* Incident response playbooks
+
+Your team's capabilities compound over time.
+
+### 🖥 Runtime Management
+
+Manage local and cloud execution environments from a single dashboard.
+
+Supported runtimes include:
+
+* Claude Code
+* Codex
+* GitHub Copilot CLI
+* Gemini
+* Cursor Agent
+* OpenCode
+* OpenClaw
+* Kiro CLI
+
+and more.
+
+### 🏢 Multi-Workspace
+
+Separate teams, projects, and organizations.
+
+Each workspace contains its own:
+
+* Agents
+* Issues
+* Skills
+* Automations
+* Permissions
+
+---
+
+## Example Workflow
+
+```text
+Create Issue
+      │
+      ▼
+Assign to Agent
+      │
+      ▼
+Agent Claims Task
+      │
+      ▼
+Executes Work
+      │
+      ▼
+Reports Progress
+      │
+      ▼
+Creates PR
+      │
+      ▼
+Task Completed
+      │
+      ▼
+Knowledge Added To Team Memory
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## Architecture
 
-```sh
-turbo build --filter=docs
+```text
+┌─────────────────┐
+│     Frontend    │
+│     Next.js     │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│    API Layer    │
+│       Go        │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   PostgreSQL    │
+│   + pgvector    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Agent Runtimes  │
+└─────────────────┘
 ```
 
-Without global `turbo`:
+### Stack
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+| Layer    | Technology            |
+| -------- | --------------------- |
+| Frontend | Next.js               |
+| Backend  | Go                    |
+| Database | PostgreSQL + pgvector |
+| Realtime | WebSockets            |
+| Runtime  | Local & Cloud Agents  |
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## Vision
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+The next generation of companies won't just hire people.
 
-```sh
-cd my-turborepo
-turbo dev
-```
+They'll hire agents.
 
-Without global `turbo`, use your package manager:
+Agenta provides the infrastructure to manage, coordinate, and scale human + agent teams.
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
+Start with one engineer and one agent.
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Scale to a workforce of hundreds.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+**Agenta is the operating system for human + agent teams.**
 
-```sh
-turbo dev --filter=web
-```
+---
 
-Without global `turbo`:
+## License
 
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+MIT License
