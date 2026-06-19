@@ -183,7 +183,7 @@ func (b *kimiBackend) Execute(ctx context.Context, prompt string, opts ExecOptio
 		initResult, err := c.request(runCtx, "initialize", map[string]any{
 			"protocolVersion": 1,
 			"clientInfo": map[string]any{
-				"name":    "multica-agent-sdk",
+				"name":    "agenta-agent-sdk",
 				"version": "0.2.0",
 			},
 			"clientCapabilities": map[string]any{},
@@ -396,15 +396,7 @@ func (b *kimiBackend) Execute(ctx context.Context, prompt string, opts ExecOptio
 	return &Session{Messages: msgCh, Result: resCh}, nil
 }
 
-// kimiToolNameFromTitle normalises tool names emitted by Kimi's ACP
-// server into the snake_case identifiers the Multica UI expects.
-//
-// Kimi follows the ACP spec where `title` is a short human-readable
-// label such as "Read file: /path/to/foo.go" or "Run command: ls".
-// hermesToolNameFromTitle upstream handles hermes' lowercase
-// convention ("read:", "patch (replace)") but not kimi's capitalised
-// format — so we get called on the already-mapped name from hermes
-// and fix up anything that slipped through. Empty input returns "".
+
 func kimiToolNameFromTitle(title string) string {
 	t := strings.TrimSpace(title)
 	if t == "" {

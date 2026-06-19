@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ezeslucky/agenta/server/internal/util"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/multica-ai/multica/server/internal/util"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 // Helper to build a pgtype.UUID from a string.

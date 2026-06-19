@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/gorilla/websocket"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 // WSLongConnConnector is the production EventConnector that holds the

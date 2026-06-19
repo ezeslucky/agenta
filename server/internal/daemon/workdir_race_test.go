@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/multica-ai/multica/server/internal/daemon/execenv"
+	"github.com/ezeslucky/agenta/server/internal/daemon/execenv"
 )
 
 // TestHandleTask_DoesNotCallStartTaskItself is the regression guard for
@@ -26,7 +26,7 @@ import (
 // Before the fix: handleTask called StartTask before invoking the runner,
 // flipping the server-side state to "running" while the per-task workdir
 // still didn't exist on disk. Hermes/OpenClaw agents that resolved
-// /multica_workspaces/{ws}/{short-id}/workdir from the running signal
+// /AGENTA_workspaces/{ws}/{short-id}/workdir from the running signal
 // would then hit FileNotFoundError.
 func TestHandleTask_DoesNotCallStartTaskItself(t *testing.T) {
 	t.Parallel()
@@ -95,9 +95,9 @@ func TestRunTask_StartTaskCalledAfterWorkdirOnDisk(t *testing.T) {
 	expectedWorkDir := filepath.Join(expectedEnvRoot, "workdir")
 
 	var (
-		startCalled    atomic.Bool
-		workdirOnDisk  atomic.Bool
-		envRootOnDisk  atomic.Bool
+		startCalled   atomic.Bool
+		workdirOnDisk atomic.Bool
+		envRootOnDisk atomic.Bool
 	)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -178,7 +178,7 @@ func TestHandleTask_KeepsEnvRootActiveAcrossCompletion(t *testing.T) {
 	expectedEnvRoot := execenv.PredictRootDir(workspacesRoot, workspaceID, taskID)
 
 	var (
-		completeCalled atomic.Bool
+		completeCalled   atomic.Bool
 		activeAtComplete atomic.Bool
 	)
 

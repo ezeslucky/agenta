@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/jackc/pgx/v5/pgxpool"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 const testResolverSlug = "middleware-resolver-test"
@@ -20,7 +20,7 @@ func openPool(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://multica:multica@localhost:5432/multica?sslmode=disable"
+		dbURL = "postgres://agenta:agenta@localhost:5432/agenta?sslmode=disable"
 	}
 	pool, err := pgxpool.New(context.Background(), dbURL)
 	if err != nil {

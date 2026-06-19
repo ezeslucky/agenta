@@ -19,13 +19,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ezeslucky/agenta/server/internal/middleware"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
+	"github.com/ezeslucky/agenta/server/pkg/protocol"
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/multica-ai/multica/server/internal/middleware"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
-	"github.com/multica-ai/multica/server/pkg/protocol"
 )
 
 // githubAPIBase is the base URL for GitHub's REST API. Mutable so tests can
@@ -263,7 +263,7 @@ func verifyState(token string) (string, bool) {
 }
 
 // GitHubConnect (GET /api/workspaces/{id}/github/connect) returns the URL the
-// browser should open to install the Multica GitHub App against the caller's
+// browser should open to install the agenta GitHub App against the caller's
 // repos. The state token binds the resulting setup callback to this workspace.
 func (h *Handler) GitHubConnect(w http.ResponseWriter, r *http.Request) {
 	workspaceID := chi.URLParam(r, "id")
@@ -332,7 +332,7 @@ func (h *Handler) GitHubSetupCallback(w http.ResponseWriter, r *http.Request) {
 
 	// Best-effort capture of the connecting user (may be nil if the public
 	// callback was hit without a session — e.g. user wasn't logged in to
-	// Multica when they finished the GitHub install). Either way we save
+	// agenta when they finished the GitHub install). Either way we save
 	// the row so the workspace owner sees the connection on next reload.
 	connectedBy := pgtype.UUID{}
 	if userID := requestUserID(r); userID != "" {

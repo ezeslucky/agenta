@@ -16,21 +16,21 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/multica-ai/multica/server/internal/analytics"
-	"github.com/multica-ai/multica/server/internal/auth"
-	"github.com/multica-ai/multica/server/internal/cloudruntime"
-	"github.com/multica-ai/multica/server/internal/daemonws"
-	"github.com/multica-ai/multica/server/internal/events"
-	"github.com/multica-ai/multica/server/internal/handler"
-	"github.com/multica-ai/multica/server/internal/integrations/lark"
-	obsmetrics "github.com/multica-ai/multica/server/internal/metrics"
-	"github.com/multica-ai/multica/server/internal/middleware"
-	"github.com/multica-ai/multica/server/internal/realtime"
-	"github.com/multica-ai/multica/server/internal/service"
-	"github.com/multica-ai/multica/server/internal/storage"
-	"github.com/multica-ai/multica/server/internal/util"
-	"github.com/multica-ai/multica/server/internal/util/secretbox"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
+	"github.com/ezeslucky/agenta/server/internal/analytics"
+	"github.com/ezeslucky/agenta/server/internal/auth"
+	"github.com/ezeslucky/agenta/server/internal/cloudruntime"
+	"github.com/ezeslucky/agenta/server/internal/daemonws"
+	"github.com/ezeslucky/agenta/server/internal/events"
+	"github.com/ezeslucky/agenta/server/internal/handler"
+	"github.com/ezeslucky/agenta/server/internal/integrations/lark"
+	obsmetrics "github.com/ezeslucky/agenta/server/internal/metrics"
+	"github.com/ezeslucky/agenta/server/internal/middleware"
+	"github.com/ezeslucky/agenta/server/internal/realtime"
+	"github.com/ezeslucky/agenta/server/internal/service"
+	"github.com/ezeslucky/agenta/server/internal/storage"
+	"github.com/ezeslucky/agenta/server/internal/util"
+	"github.com/ezeslucky/agenta/server/internal/util/secretbox"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 )
 
 var defaultOrigins = []string{
@@ -63,7 +63,7 @@ func allowedOrigins() []string {
 }
 
 // parseTrustedProxies parses a comma-separated list of CIDR prefixes from the
-// MULTICA_TRUSTED_PROXIES env var. Invalid entries are dropped with a single
+// AGENTA_TRUSTED_PROXIES env var. Invalid entries are dropped with a single
 // warn-line per entry rather than crashing the server — a typo in one CIDR
 // shouldn't take the whole API down. Returns nil for empty input, which the
 // rate limiter treats as "trust no proxy headers, use RemoteAddr only".
@@ -80,7 +80,7 @@ func parseTrustedProxies(raw string) []netip.Prefix {
 		}
 		p, err := netip.ParsePrefix(s)
 		if err != nil {
-			slog.Warn("MULTICA_TRUSTED_PROXIES: ignoring invalid CIDR",
+			slog.Warn("AGENTA_TRUSTED_PROXIES: ignoring invalid CIDR",
 				"value", s, "error", err)
 			continue
 		}
@@ -161,10 +161,10 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 		AllowedEmails:            splitAndTrim(os.Getenv("ALLOWED_EMAILS")),
 		AllowedEmailDomains:      splitAndTrim(os.Getenv("ALLOWED_EMAIL_DOMAINS")),
 		DisableWorkspaceCreation: os.Getenv("DISABLE_WORKSPACE_CREATION") == "true",
-		PublicURL:                strings.TrimRight(strings.TrimSpace(os.Getenv("MULTICA_PUBLIC_URL")), "/"),
-		TrustedProxies:           parseTrustedProxies(os.Getenv("MULTICA_TRUSTED_PROXIES")),
+		PublicURL:                strings.TrimRight(strings.TrimSpace(os.Getenv("AGENTA_PUBLIC_URL")), "/"),
+		TrustedProxies:           parseTrustedProxies(os.Getenv("AGENTA_TRUSTED_PROXIES")),
 		CloudRuntimeFleetURL:     cloudRuntimeFleetURLFromEnv(),
-		CloudRuntimeFleetTimeout: envDuration("MULTICA_CLOUD_FLEET_TIMEOUT", 35*time.Second),
+		CloudRuntimeFleetTimeout: envDuration("AGENTA_CLOUD_FLEET_TIMEOUT", 35*time.Second),
 		AttachmentDownloadMode:   os.Getenv("ATTACHMENT_DOWNLOAD_MODE"),
 		AttachmentDownloadURLTTL: envDuration("ATTACHMENT_DOWNLOAD_URL_TTL", 30*time.Minute),
 	}
@@ -175,7 +175,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 	if opts.BusinessMetrics != nil {
 		// Wire the BusinessMetrics receiver into the cloud runtime client
 		// so every outbound Fleet/Gateway request feeds the
-		// multica_cloudruntime_request_* histograms.
+		// AGENTA_cloudruntime_request_* histograms.
 		if client, ok := h.CloudRuntime.(*cloudruntime.Client); ok {
 			client.SetRecorder(opts.BusinessMetrics)
 		}
@@ -196,14 +196,14 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 		h.WebhookIPRateLimiter = handler.NewRedisWebhookIPRateLimiter(rdb, handler.DefaultWebhookIPRateLimit())
 	}
 
-	// Lark integration. Only wired when MULTICA_LARK_SECRET_KEY is set:
+	// Lark integration. Only wired when AGENTA_LARK_SECRET_KEY is set:
 	// the InstallationService refuses to fall back to plaintext storage
 	// for app_secret, and the BindingTokenService cannot mint usable
 	// tokens without it either. When the key is absent the Lark
 	// handlers return 503 with a clear message; the rest of the server
 	// continues to start so self-host deployments that have not opted
 	// in to Lark are unaffected.
-	if larkKey, err := secretbox.LoadKey("MULTICA_LARK_SECRET_KEY"); err == nil {
+	if larkKey, err := secretbox.LoadKey("AGENTA_LARK_SECRET_KEY"); err == nil {
 		box, err := secretbox.New(larkKey)
 		if err != nil {
 			slog.Error("lark: secretbox.New failed; lark integration disabled", "error", err)
@@ -218,15 +218,15 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 
 				// APIClient: wire the real Lark Open Platform HTTP client
 				// (IM v1 send/patch + binding-prompt + bot info). Setting
-				// MULTICA_LARK_SECRET_KEY is the operator's opt-in for
+				// AGENTA_LARK_SECRET_KEY is the operator's opt-in for
 				// the integration as a whole; we don't expose a separate
 				// "HTTP enabled" knob because the inbound dispatcher
 				// without outbound replies is not a useful production
 				// state, and CI / integration tests that want to avoid
-				// real Lark traffic can point MULTICA_LARK_HTTP_BASE_URL
+				// real Lark traffic can point AGENTA_LARK_HTTP_BASE_URL
 				// at a mock server.
 				//
-				// MULTICA_LARK_HTTP_BASE_URL is an OPTIONAL deployment-wide
+				// AGENTA_LARK_HTTP_BASE_URL is an OPTIONAL deployment-wide
 				// override. Normal operation leaves it empty: each call then
 				// resolves its open-platform host from the installation's
 				// region (open.feishu.cn vs open.larksuite.com), so one
@@ -234,7 +234,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 				// installation onto one host — a proxy, a mock for tests, or
 				// a single-cloud staging setup.
 				larkClient := lark.NewHTTPAPIClient(lark.HTTPClientConfig{
-					BaseURL: strings.TrimSpace(os.Getenv("MULTICA_LARK_HTTP_BASE_URL")),
+					BaseURL: strings.TrimSpace(os.Getenv("AGENTA_LARK_HTTP_BASE_URL")),
 					Logger:  slog.Default(),
 				})
 				h.LarkAPIClient = larkClient
@@ -277,7 +277,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 				// with a ctx-cancel watchdog so lease loss / shutdown
 				// breaks the blocking ReadMessage in bounded time — the
 				// invariant §4.4 leans on. If the endpoint fetcher fails
-				// to initialize (bad MULTICA_LARK_CALLBACK_BASE_URL or
+				// to initialize (bad AGENTA_LARK_CALLBACK_BASE_URL or
 				// similar config error), buildLarkConnectorFactory logs
 				// and falls back to the NoopConnector so the lease /
 				// supervisor lifecycle still runs against real DB rows —
@@ -331,8 +331,8 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 				// deployments. Off the hot startup path like the union_id
 				// backfill. MUL-3083.
 				go lark.BackfillRegionFromLegacyOverride(context.Background(), queries,
-					strings.TrimSpace(os.Getenv("MULTICA_LARK_HTTP_BASE_URL")),
-					strings.TrimSpace(os.Getenv("MULTICA_LARK_CALLBACK_BASE_URL")),
+					strings.TrimSpace(os.Getenv("AGENTA_LARK_HTTP_BASE_URL")),
+					strings.TrimSpace(os.Getenv("AGENTA_LARK_CALLBACK_BASE_URL")),
 					slog.Default())
 
 				// Device-flow registration service: end-to-end install
@@ -340,11 +340,11 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 				// for the QR-scan handshake and then commits the
 				// resulting Bot credentials + the installer's
 				// lark_user_binding in one DB transaction. The optional
-				// MULTICA_LARK_REGISTRATION_DOMAIN / _LARK_DOMAIN env
+				// AGENTA_LARK_REGISTRATION_DOMAIN / _LARK_DOMAIN env
 				// vars override the protocol hosts for staging / dev.
 				regCfg := lark.RegistrationConfig{
-					Domain:     strings.TrimSpace(os.Getenv("MULTICA_LARK_REGISTRATION_DOMAIN")),
-					LarkDomain: strings.TrimSpace(os.Getenv("MULTICA_LARK_REGISTRATION_LARK_DOMAIN")),
+					Domain:     strings.TrimSpace(os.Getenv("AGENTA_LARK_REGISTRATION_DOMAIN")),
+					LarkDomain: strings.TrimSpace(os.Getenv("AGENTA_LARK_REGISTRATION_LARK_DOMAIN")),
 				}
 				regClient := lark.NewRegistrationClient(regCfg)
 				regSvc, rerr := lark.NewRegistrationService(
@@ -369,7 +369,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 			}
 		}
 	} else {
-		slog.Info("lark integration disabled (MULTICA_LARK_SECRET_KEY not set)")
+		slog.Info("lark integration disabled (AGENTA_LARK_SECRET_KEY not set)")
 	}
 	if opts.HeartbeatScheduler != nil {
 		h.HeartbeatScheduler = opts.HeartbeatScheduler
@@ -385,12 +385,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 	h.DaemonTokenCache = daemonTokenCache
 	h.MembershipCache = auth.NewMembershipCache(rdb)
 
-	// Cloud PAT verifier: validates mcn_ tokens against Multica Cloud
-	// Fleet. Returns nil when no Fleet URL is configured — the Auth /
-	// DaemonAuth middlewares treat nil as "mcn_ not supported" and
-	// reject with 401, instead of falling through to mul_/JWT paths.
-	// Reuses MULTICA_CLOUD_FLEET_URL (the same URL the cloud-runtime
-	// proxy uses) so a deployment doesn't need a second config knob.
+	
 	cloudPATVerifier := auth.NewCloudPATVerifier(auth.CloudPATVerifierConfig{
 		FleetBaseURL: signupConfig.CloudRuntimeFleetURL,
 		Redis:        rdb,
@@ -423,7 +418,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 	// Share allowed origins with WebSocket origin checker.
 	realtime.SetAllowedOrigins(origins)
 
-	// Share the same trusted-proxy CIDRs (MULTICA_TRUSTED_PROXIES) so the
+	// Share the same trusted-proxy CIDRs (AGENTA_TRUSTED_PROXIES) so the
 	// WebSocket origin check honors X-Forwarded-Host only from trusted proxies,
 	// using one config source instead of a parallel one.
 	realtime.SetTrustedProxies(signupConfig.TrustedProxies)
@@ -495,14 +490,10 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 	// purpose: the bearer token in the URL path IS the credential. Workspace
 	// context is derived from the trigger row, never from request headers.
 	r.Post("/api/webhooks/autopilots/{token}", h.HandleAutopilotWebhook)
-	// GitHub App webhook (no Multica auth — requests are authenticated via
-	// HMAC-SHA256 signature in the handler) and post-install setup callback.
+	
 	r.Post("/api/webhooks/github", h.HandleGitHubWebhook)
 	r.Get("/api/github/setup", h.GitHubSetupCallback)
-	// Stripe webhook (no Multica auth — Stripe signs the raw body
-	// with a shared secret, the multica-cloud upstream verifies. We
-	// only forward the bytes + the Stripe-Signature header; see
-	// HandleCloudBillingStripeWebhook for the rationale).
+	
 	r.Post("/api/webhooks/stripe", h.HandleCloudBillingStripeWebhook)
 
 	// Daemon API routes (require daemon token or valid user token)
@@ -674,30 +665,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 			r.Delete("/{id}", h.RevokePersonalAccessToken)
 		})
 
-		// Cloud Billing proxy. Same upstream service / port as
-		// cloud-runtime — multica-cloud's Fleet and Billing share
-		// :8080 and the same chi router. All routes here forward
-		// to /api/v1/billing/* with X-User-ID stamped from the
-		// authenticated context.
-		//
-		// User-scoped (account-level), NOT workspace-scoped — sits
-		// outside the RequireWorkspaceMember group so a user can
-		// inspect their balance, top up, and open the Billing Portal
-		// without an active workspace selected. The upstream owner
-		// model is single-user; X-Workspace-ID would be ignored even
-		// if we sent it. The Stripe webhook is the public outlier
-		// and lives outside the entire Auth group (see above).
-		//
-		// IMPORTANT — task-token actors are blocked here. The Auth
-		// middleware happily turns an mat_ task token into a normal
-		// X-User-ID stamp (so agents can comment, claim issues, etc.
-		// as their owner), but billing is account-level and a running
-		// agent reading its owner's balance / opening a checkout
-		// session is the kind of lateral-movement we're explicitly
-		// trying to prevent. handler.RequireHumanActor checks the
-		// authoritative server-set X-Actor-Source header and 403s
-		// any task-token request. See actor_guards.go for the full
-		// rationale.
+		
 		r.Route("/api/cloud-billing", func(r chi.Router) {
 			r.Use(handler.RequireHumanActor)
 
@@ -1027,7 +995,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 // the invariant §4.4 leans on.
 //
 // If the endpoint fetcher fails to initialize (typically a malformed
-// MULTICA_LARK_CALLBACK_BASE_URL), we log and fall back to the
+// AGENTA_LARK_CALLBACK_BASE_URL), we log and fall back to the
 // NoopConnector so the lease / supervisor lifecycle still exercises
 // against real DB rows. Inbound messages are silently dropped until
 // the config is fixed; the boot log labels the mode "noop" so the
@@ -1037,7 +1005,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 // the healthy case, "noop" in the fallback case.
 func buildLarkConnectorFactory(installSvc *lark.InstallationService, apiClient lark.APIClient) (lark.ConnectorFactory, string) {
 	endpointFetcher, err := lark.NewHTTPConnectionTokenFetcher(lark.HTTPConnectionTokenConfig{
-		BaseURL: strings.TrimSpace(os.Getenv("MULTICA_LARK_CALLBACK_BASE_URL")),
+		BaseURL: strings.TrimSpace(os.Getenv("AGENTA_LARK_CALLBACK_BASE_URL")),
 		Logger:  slog.Default(),
 	})
 	if err != nil {
@@ -1171,8 +1139,8 @@ func splitAndTrim(s string) []string {
 }
 
 func cloudRuntimeFleetURLFromEnv() string {
-	if url := strings.TrimSpace(os.Getenv("MULTICA_CLOUD_FLEET_URL")); url != "" {
+	if url := strings.TrimSpace(os.Getenv("AGENTA_CLOUD_FLEET_URL")); url != "" {
 		return url
 	}
-	return strings.TrimSpace(os.Getenv("MULTICA_FLEET_URL"))
+	return strings.TrimSpace(os.Getenv("AGENTA_FLEET_URL"))
 }

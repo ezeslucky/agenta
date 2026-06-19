@@ -21,7 +21,7 @@ import (
 //     action=begin and (archetype=PersonalAgent / auth_method=client_secret
 //     / request_user_info=open_id). Lark returns a device_code, a
 //     verification_uri_complete (the QR target), a polling interval,
-//     and an expiry. Multica renders the QR, the user scans it in the
+//     and an expiry. Agenta renders the QR, the user scans it in the
 //     Lark app, walks the "create a PersonalAgent for this account"
 //     flow, and authorizes.
 //
@@ -108,9 +108,7 @@ type RegistrationConfig struct {
 	// headroom for cross-region paths.
 	HTTPClient *http.Client
 
-	// Source labels the QR-code URL's `source` query param so Lark's
-	// telemetry can attribute installs back to Multica. Empty defaults
-	// to "multica".
+	
 	Source string
 
 	// Now is overridable for deterministic expiry-bound tests.
@@ -128,7 +126,7 @@ func (c RegistrationConfig) withDefaults() RegistrationConfig {
 		c.HTTPClient = &http.Client{Timeout: 30 * time.Second}
 	}
 	if c.Source == "" {
-		c.Source = "multica"
+		c.Source = "agenta"
 	}
 	if c.Now == nil {
 		c.Now = time.Now
@@ -153,7 +151,7 @@ func NewRegistrationClient(cfg RegistrationConfig) *RegistrationClient {
 // BeginResult is what Begin returns to RegistrationService.
 type BeginResult struct {
 	DeviceCode string
-	// QRCodeURL is the verification_uri_complete with Multica's `source`
+	// QRCodeURL is the verification_uri_complete with Agenta's `source`
 	// telemetry params appended; render this as a QR image client-side.
 	QRCodeURL string
 	// Domain is the polling host this session opened against. The
@@ -244,7 +242,7 @@ func (e *RegistrationError) Error() string {
 //
 // namePreset pre-fills the bot/app name on Lark's "create a
 // PersonalAgent" form so the installed bot defaults to e.g.
-// "<agent> - Multica" instead of Lark's auto-generated
+// "<agent> - Agenta" instead of Lark's auto-generated
 // "{用户姓名}的智能助手". It is a user-editable default (the user can
 // still change it on the form), and it rides on the QR URL — not the
 // begin POST body, which has no name field. Empty omits the pre-fill.
@@ -452,16 +450,7 @@ func (c *RegistrationClient) doForm(ctx context.Context, domain string, form url
 	}
 }
 
-// decorateQRCodeURL appends the SDK-style telemetry params Lark expects
-// on the QR-image URL. Without `from=sdk&tp=sdk&source=<src>` the
-// scanner UI on the user's phone shows a less polished prompt and Lark
-// cannot attribute installs back to Multica in their analytics.
-//
-// namePreset, when non-empty, is appended as `name=<...>` to pre-fill
-// the bot/app name on Lark's "create a PersonalAgent" form. This
-// mirrors the upstream SDK's AppPreset.Name: Lark reads it from the
-// verification/QR URL (the begin POST body carries no name field) and
-// treats it as a user-editable default, not a locked final name.
+
 func decorateQRCodeURL(raw, source, namePreset string) (string, error) {
 	u, err := url.Parse(raw)
 	if err != nil {

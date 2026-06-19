@@ -6,25 +6,6 @@ import (
 	"strings"
 )
 
-// stripSkillsConfigEntries removes every `[[skills.config]]` array-of-tables
-// block from the given config.toml content.
-//
-// Background: Codex Desktop writes one `[[skills.config]]` entry per skill it
-// knows about — file-backed skills get a `path = "..."` field, while
-// plugin-backed skills (e.g. `name = "superpowers:brainstorming"`) only get a
-// `name`. Codex CLI 0.114's TOML deserializer treats `path` as a required
-// field, so it rejects the plugin entries with `missing field path` and
-// refuses to start. Multica copies the user's `~/.codex/config.toml` verbatim
-// into each task's isolated codex-home, which propagates the broken entries
-// into the per-task config and blocks `codex thread/start`.
-//
-// Stripping the whole `[[skills.config]]` array sidesteps the issue: Multica
-// writes the agent's currently assigned skills directly to
-// `codex-home/skills/<name>/SKILL.md`, and Codex auto-discovers them from
-// that directory. The user-level skill registry is irrelevant to a per-task
-// run, so dropping it is both safe and the right scope of isolation.
-//
-// Lines outside `[[skills.config]]` blocks are preserved untouched.
 func stripSkillsConfigEntries(content string) string {
 	if !strings.Contains(content, "[[skills.config]]") {
 		return content

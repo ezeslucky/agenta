@@ -6,13 +6,13 @@ after the latest `main` merge; the prior skill cited pre-merge lines that have
 since moved (see the "drifted" column). Re-confirm with the verification command
 at the bottom before relying on an exact line.
 
-## `multica issue pull-requests` — read PR links from Multica
+## `agenta issue pull-requests` — read PR links from Agenta
 
 | Behavior | File:line | Drifted from |
 |---|---|---|
-| CLI command `pull-requests <id>` (alias `prs`) | `server/cmd/multica/cmd_issue.go:105` | `:104` |
-| `runIssuePullRequests` handler | `server/cmd/multica/cmd_issue.go:507` | new citation |
-| Calls `GET /api/issues/<id>/pull-requests` | `server/cmd/multica/cmd_issue.go:522` | `:522` (unchanged) |
+| CLI command `pull-requests <id>` (alias `prs`) | `server/cmd/agenta/cmd_issue.go:105` | `:104` |
+| `runIssuePullRequests` handler | `server/cmd/agenta/cmd_issue.go:507` | new citation |
+| Calls `GET /api/issues/<id>/pull-requests` | `server/cmd/agenta/cmd_issue.go:522` | `:522` (unchanged) |
 | API route registration | `server/cmd/server/router.go:480` | `:480` (unchanged) |
 | Handler `ListPullRequestsForIssue` → `Queries.ListPullRequestsByIssue` | `server/internal/handler/github.go:466,471` | `:466` (unchanged) |
 | Row → response mapper `issuePullRequestRowToResponse` | `server/internal/handler/github.go:149` | new citation |
@@ -70,7 +70,7 @@ auto-link flag (`workspaceAutoLinkPRsEnabled`, `github.go:1074`).
 
 Every `PREFIX-NUMBER` mention in **title, body, or branch** resolves to an issue
 in the workspace and writes a link row (`LinkIssueToPullRequest`, ~`github.go:762`).
-This is what `multica issue pull-requests` later reads back.
+This is what `agenta issue pull-requests` later reads back.
 
 Drifted from the prior skill's `github.go:727` citation, which pointed at the old
 call-site location for the link logic.
@@ -115,8 +115,8 @@ line 2537).
 
 | Behavior | File:line |
 |---|---|
-| `multica issue metadata set <issue-id> --key --value [--type]` | `server/cmd/multica/cmd_issue_metadata.go:80,109-111` |
-| `multica issue metadata delete <issue-id> --key` | `server/cmd/multica/cmd_issue_metadata.go:93,113` |
+| `agenta issue metadata set <issue-id> --key --value [--type]` | `server/cmd/agenta/cmd_issue_metadata.go:80,109-111` |
+| `agenta issue metadata delete <issue-id> --key` | `server/cmd/agenta/cmd_issue_metadata.go:93,113` |
 | API routes (PUT/DELETE `/metadata/{key}`) | `server/cmd/server/router.go:478-479` |
 
 `--value` is JSON-parsed by default (bool/number sniff); `--type` forces
@@ -128,7 +128,7 @@ Re-derive any line above before depending on it:
 
 ```bash
 cd server
-grep -n 'pull-requests <id>'                 cmd/multica/cmd_issue.go
+grep -n 'pull-requests <id>'                 cmd/agenta/cmd_issue.go
 grep -n 'ListPullRequestsForIssue'           cmd/server/router.go internal/handler/github.go
 grep -n 'func issuePullRequestRowToResponse\|type GitHubPullRequestResponse struct\|func derivePRState\|func extractIdentifiers\|func extractClosingIdentifiers\|closingIdentifierRe' internal/handler/github.go
 grep -n 'extractIdentifiers(\|extractClosingIdentifiers(\|derivePRState(' internal/handler/github.go

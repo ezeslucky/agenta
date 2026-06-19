@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/jackc/pgx/v5/pgtype"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 // fakeTypingAPIClient records reaction calls and can be programmed to fail.

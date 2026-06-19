@@ -18,47 +18,6 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// MUL-2956 — concurrent migration race test.
-//
-// PR multica-ai/multica#3658 (MUL-2923) added a Postgres advisory lock
-// around the migration loop to serialize concurrent runners. This file
-// is the live-Postgres test that proves the lock is actually doing its
-// job. We run N goroutines that all call runMigrations against the same
-// database with the same options, and assert:
-//
-//  1. Pending: when migrations have NOT been applied, every goroutine
-//     returns nil and exactly one application of each migration lands
-//     in the bookkeeping table — no duplicate-key blow-ups, no missing
-//     rows, and (since our test fixtures are deliberately non-idempotent
-//     bare CREATE TABLE / ALTER TABLE) no "relation already exists"
-//     failures from the SQL itself, which would prove the lock isn't
-//     serializing.
-//  2. Already applied: rerunning the same N-way race against the just-
-//     populated bookkeeping table sends every goroutine down the EXISTS
-//     no-op path; nobody re-applies anything and the underlying schema
-//     is unchanged.
-//  3. Lock serialization: while one connection holds the same advisory
-//     lock externally, every concurrent runMigrations is observed to
-//     wait, and only after the external holder releases does the lock
-//     get acquired. This catches the regression where the lock would
-//     get attached to a random pooled connection (the bug fixed in
-//     MUL-2923 / #3658) and effectively become a no-op.
-//
-// The test connects to whatever DATABASE_URL points at (default
-// postgres://multica:multica@localhost:5432/multica?sslmode=disable),
-// matching the harness pattern already used in
-// server/internal/handler/handler_test.go and
-// server/internal/metrics/business_sampler_pgsleep_test.go. If
-// Postgres is unreachable the suite skips cleanly, the same way every
-// other live-Postgres test in the repo skips, so CI without a database
-// sees SKIP rather than failure.
-//
-// Each test isolates itself by creating a unique throwaway schema
-// (migrate_test_<timestamp>_<rand>) and using a unique advisory-lock
-// key per run. That means the test never touches the real
-// schema_migrations table and never blocks behind a real production
-// migration runner sharing the same database. The schema is dropped
-// during cleanup.
 
 const (
 	// concurrentRunners is the goroutine count for the race tests. Set
@@ -76,7 +35,7 @@ func openTestPool(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://multica:multica@localhost:5432/multica?sslmode=disable"
+		dbURL = "postgres://agenta:agenta@localhost:5432/agenta?sslmode=disable"
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -351,7 +310,7 @@ func TestRunMigrationsAdvisoryLockSerializes(t *testing.T) {
 	// prove serialization.)
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://multica:multica@localhost:5432/multica?sslmode=disable"
+		dbURL = "postgres://agenta:agenta@localhost:5432/agenta?sslmode=disable"
 	}
 	holder, err := pgx.Connect(ctx, dbURL)
 	if err != nil {
@@ -414,7 +373,7 @@ func TestRunMigrationsAdvisoryLockSerializes(t *testing.T) {
 func TestRunMigrationsConcurrentMixedPoolStress(t *testing.T) {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://multica:multica@localhost:5432/multica?sslmode=disable"
+		dbURL = "postgres://agenta:agenta@localhost:5432/agenta?sslmode=disable"
 	}
 	cfg, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {

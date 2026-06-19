@@ -102,9 +102,9 @@ a pointer.
 
 | List command | Field used as mention id | Source |
 | --- | --- | --- |
-| `workspace member list` | `user_id` (NOT the membership-row id) | `server/cmd/multica/cmd_workspace.go:465` |
-| `agent list` | `id` | `server/cmd/multica/cmd_agent.go:365` |
-| `squad list` | `id` | `server/cmd/multica/cmd_squad.go:57` |
+| `workspace member list` | `user_id` (NOT the membership-row id) | `server/cmd/agenta/cmd_workspace.go:465` |
+| `agent list` | `id` | `server/cmd/agenta/cmd_agent.go:365` |
+| `squad list` | `id` | `server/cmd/agenta/cmd_squad.go:57` |
 | Member mention uses `user_id`, confirmed by the backend roster formatter: `formatMention(user.Name, "member", userID)` where `userID = UUIDToString(m.MemberID)` | `server/internal/handler/squad_briefing.go:189-190` |
 | `formatMention` emits `[@<name>](mention://<type>/<id>)` | `server/internal/handler/squad_briefing.go:216-218` |
 
