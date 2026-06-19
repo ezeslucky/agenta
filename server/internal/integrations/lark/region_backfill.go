@@ -6,13 +6,13 @@ import (
 	"net/url"
 	"strings"
 
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 )
 
 // BackfillRegionFromLegacyOverride is the upgrade-repair path for self-host
 // deployments that ran the WHOLE Lark integration against Lark international
-// via the deployment-wide MULTICA_LARK_HTTP_BASE_URL /
-// MULTICA_LARK_CALLBACK_BASE_URL override, before per-installation region
+// via the deployment-wide AGENTA_LARK_HTTP_BASE_URL /
+// AGENTA_LARK_CALLBACK_BASE_URL override, before per-installation region
 // existed.
 //
 // Migration 116 backfilled every existing row to 'feishu' (the mainland

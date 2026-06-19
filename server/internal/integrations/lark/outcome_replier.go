@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/jackc/pgx/v5/pgtype"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 // OutcomeReplier reacts to the Dispatcher's verdict by posting the
@@ -84,15 +84,15 @@ type LarkOutcomeReplier struct {
 	bindingSvc   *BindingTokenService
 	credentials  CredentialsResolver
 	queries      OutcomeReplierQueries
-	publicURL    string // e.g. https://multica.example, trailing slash trimmed
+	publicURL    string // e.g. https://agenta.example, trailing slash trimmed
 	bindingPath  string // path component of the binding URL, default "/lark/bind"
 	noticeHeader string // header text used by the offline/archived cards
 	log          *slog.Logger
 }
 
 // OutcomeReplierConfig wires the production replier. PublicURL is the
-// Multica HTTP host the user clicks into to redeem the binding token
-// (e.g. https://multica.example); empty means the binding flow can
+// agenta HTTP host the user clicks into to redeem the binding token
+// (e.g. https://agenta.example); empty means the binding flow can
 // only log the open_id, not produce a clickable card. The other
 // fields default at construction.
 type OutcomeReplierConfig struct {
@@ -121,7 +121,7 @@ func NewLarkOutcomeReplier(cfg OutcomeReplierConfig) OutcomeReplier {
 		return NewNoopOutcomeReplier(log)
 	}
 	if cfg.PublicURL == "" {
-		log.Warn("lark outcome replier: MULTICA_PUBLIC_URL not set; binding prompt CTA will not work")
+		log.Warn("lark outcome replier: AGENTA_PUBLIC_URL not set; binding prompt CTA will not work")
 	}
 	bindingPath := cfg.BindingPath
 	if bindingPath == "" {
@@ -137,7 +137,7 @@ func NewLarkOutcomeReplier(cfg OutcomeReplierConfig) OutcomeReplier {
 		queries:      cfg.Queries,
 		publicURL:    strings.TrimRight(cfg.PublicURL, "/"),
 		bindingPath:  bindingPath,
-		noticeHeader: "Multica",
+		noticeHeader: "Agenta",
 		log:          log,
 	}
 }
@@ -223,7 +223,7 @@ func (r *LarkOutcomeReplier) sendBindingPrompt(ctx context.Context, inst db.Lark
 // as a plain text message. We deliberately send text rather than an
 // interactive card so the confirmation flows inline with the rest of
 // the Lark conversation — consistent with how chat replies render
-// after MUL-2671's plain-text refactor. The link to Multica is
+// after MUL-2671's plain-text refactor. The link to agenta is
 // included on its own line so Lark's auto-linker turns it into a
 // tappable URL.
 func (r *LarkOutcomeReplier) sendIssueCreated(ctx context.Context, inst db.LarkInstallation, msg InboundMessage, res DispatchResult) error {
@@ -249,7 +249,7 @@ func (r *LarkOutcomeReplier) sendIssueCreated(ctx context.Context, inst db.LarkI
 // always wins over a bare number — DispatchResult.IssueIdentifier
 // already encodes the workspace prefix when available. PublicURL is
 // optional: when empty (self-host operators who haven't configured
-// MULTICA_PUBLIC_URL) the message still confirms the issue, just
+// AGENTA_PUBLIC_URL) the message still confirms the issue, just
 // without a deep link the user can tap.
 func issueCreatedText(res DispatchResult, publicURL string) string {
 	identifier := res.IssueIdentifier

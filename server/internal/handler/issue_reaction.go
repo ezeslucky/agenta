@@ -5,10 +5,10 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/ezeslucky/agenta/server/internal/logger"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
+	"github.com/ezeslucky/agenta/server/pkg/protocol"
 	"github.com/go-chi/chi/v5"
-	"github.com/multica-ai/multica/server/internal/logger"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
-	"github.com/multica-ai/multica/server/pkg/protocol"
 )
 
 type IssueReactionResponse struct {

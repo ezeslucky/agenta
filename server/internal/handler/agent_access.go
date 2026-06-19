@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 
+	"github.com/ezeslucky/agenta/server/internal/util"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/multica-ai/multica/server/internal/util"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 // canAccessPrivateAgent gates the four protected surfaces for private
@@ -73,6 +73,7 @@ func (h *Handler) accessibleAgentIDs(ctx context.Context, workspaceID, actorType
 	}
 	return allowed, true
 }
+
 // canEnqueueSquadLeader returns true when the given actor is allowed to
 // trigger the squad's private leader. It loads the leader agent and delegates
 // to canAccessPrivateAgent. Non-private leaders always pass. System-initiated

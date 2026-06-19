@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"github.com/ezeslucky/agenta/server/internal/auth"
+	"github.com/ezeslucky/agenta/server/internal/util"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/jackc/pgx/v5"
-	"github.com/multica-ai/multica/server/internal/auth"
-	"github.com/multica-ai/multica/server/internal/util"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 // ownerLookupFor returns an auth.OwnerLookupFunc that asks the

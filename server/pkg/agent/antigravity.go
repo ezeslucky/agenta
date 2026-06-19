@@ -38,16 +38,6 @@ func (b *antigravityBackend) Execute(ctx context.Context, prompt string, opts Ex
 		return nil, fmt.Errorf("agy executable not found at %q: %w", execPath, err)
 	}
 
-	// Guard against agy's silent no-op on an unrecognised --model: it exits 0
-	// with empty output, which would otherwise surface as a "completed" but
-	// empty task. opts.Model is the single funnel for both agent.model and the
-	// daemon-wide MULTICA_ANTIGRAVITY_MODEL default (resolved in daemon.go), so
-	// validating it here covers every source — UI free-text, API, a persisted
-	// value, and the env default alike. Reject a non-empty model the installed
-	// CLI definitively does not advertise, with an actionable error. Validation
-	// is fail-OPEN: if the `agy models` catalog can't be discovered we let agy
-	// resolve the value itself rather than blocking the run on a discovery
-	// hiccup (see antigravityModelError).
 	if opts.Model != "" {
 		catalog, _ := ListModels(ctx, "antigravity", execPath)
 		if err := antigravityModelError(opts.Model, catalog); err != nil {
@@ -58,7 +48,7 @@ func (b *antigravityBackend) Execute(ctx context.Context, prompt string, opts Ex
 	timeout := opts.Timeout
 	runCtx, cancel := runContext(ctx, timeout)
 
-	logFile, err := os.CreateTemp("", "multica-agy-log-*.log")
+	logFile, err := os.CreateTemp("", "agenta-agy-log-*.log")
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("create agy log file: %w", err)

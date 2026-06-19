@@ -15,18 +15,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ezeslucky/agenta/server/internal/analytics"
+	"github.com/ezeslucky/agenta/server/internal/auth"
+	"github.com/ezeslucky/agenta/server/internal/daemonws"
+	obsmetrics "github.com/ezeslucky/agenta/server/internal/metrics"
+	"github.com/ezeslucky/agenta/server/internal/middleware"
+	"github.com/ezeslucky/agenta/server/internal/service"
+	"github.com/ezeslucky/agenta/server/internal/util"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
+	"github.com/ezeslucky/agenta/server/pkg/protocol"
+	"github.com/ezeslucky/agenta/server/pkg/redact"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/multica-ai/multica/server/internal/analytics"
-	"github.com/multica-ai/multica/server/internal/auth"
-	"github.com/multica-ai/multica/server/internal/daemonws"
-	obsmetrics "github.com/multica-ai/multica/server/internal/metrics"
-	"github.com/multica-ai/multica/server/internal/middleware"
-	"github.com/multica-ai/multica/server/internal/service"
-	"github.com/multica-ai/multica/server/internal/util"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
-	"github.com/multica-ai/multica/server/pkg/protocol"
-	"github.com/multica-ai/multica/server/pkg/redact"
 )
 
 // ---------------------------------------------------------------------------
@@ -174,7 +174,7 @@ type DaemonRegisterRequest struct {
 	// and tasks keep working without manual intervention.
 	LegacyDaemonIDs []string `json:"legacy_daemon_ids"`
 	DeviceName      string   `json:"device_name"`
-	CLIVersion      string   `json:"cli_version"` // multica CLI version
+	CLIVersion      string   `json:"cli_version"` // agenta CLI version
 	LaunchedBy      string   `json:"launched_by"` // "desktop" when spawned by the Electron app
 	Runtimes        []struct {
 		Name    string `json:"name"`
@@ -1207,7 +1207,7 @@ func (h *Handler) ClaimTaskByRuntime(w http.ResponseWriter, r *http.Request) {
 	resp := taskToResponse(*task, runtimeWorkspaceID)
 	if agent, err := h.Queries.GetAgent(r.Context(), task.AgentID); err == nil {
 		// Workspace-bound skills first, then platform built-in skills. Built-in
-		// names carry a "multica-" prefix so their on-disk slugs never collide
+		// names carry a "agenta-" prefix so their on-disk slugs never collide
 		// with a user-authored workspace skill (see writeSkillFiles).
 		skills := h.TaskService.LoadAgentSkills(r.Context(), task.AgentID)
 		agentSkillCount = len(skills)
@@ -1349,7 +1349,7 @@ func (h *Handler) ClaimTaskByRuntime(w http.ResponseWriter, r *http.Request) {
 							Label:        label,
 						})
 						// Lift github_repo resources into the daemon's repo list
-						// so `multica repo checkout` and the meta-skill render
+						// so `agenta repo checkout` and the meta-skill render
 						// them as the issue's repos.
 						if row.ResourceType == "github_repo" {
 							var payload struct {
@@ -1519,7 +1519,7 @@ func (h *Handler) ClaimTaskByRuntime(w http.ResponseWriter, r *http.Request) {
 			// messages after the last assistant message (every completed or
 			// failed run writes an assistant row, so that anchor advances each
 			// turn). Attachments are collected from each included message so
-			// the agent can `multica attachment download <id>` — the markdown
+			// the agent can `agenta attachment download <id>` — the markdown
 			// URL alone is signed and 30-min expiring on the private CDN.
 			if msgs, err := h.Queries.ListChatMessages(r.Context(), cs.ID); err == nil && len(msgs) > 0 {
 				unanswered := trailingUserMessages(msgs)
@@ -1596,7 +1596,7 @@ func (h *Handler) ClaimTaskByRuntime(w http.ResponseWriter, r *http.Request) {
 			// When the user picked a project in the modal, surface its title
 			// and resources to the daemon so the agent has the same context
 			// it would for an issue-bound task: the prompt template can name
-			// the project, and `multica repo checkout` sees the project's
+			// the project, and `agenta repo checkout` sees the project's
 			// github_repo resources instead of the workspace fallback.
 			var projectRepos []RepoData
 			if qc.ProjectID != "" {
@@ -1709,7 +1709,7 @@ func (h *Handler) ClaimTaskByRuntime(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Workspace isolation check: the daemon uses this response's workspace_id
-	// as the only authority for MULTICA_WORKSPACE_ID in the agent env. An
+	// as the only authority for AGENTA_WORKSPACE_ID in the agent env. An
 	// empty value would make the CLI silently fall back to the user-global
 	// config and talk to whatever workspace the user happened to last
 	// configure; a value that doesn't match the runtime's workspace means
@@ -1755,7 +1755,7 @@ func (h *Handler) ClaimTaskByRuntime(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Mint a task-scoped `mat_` token bound to (agent, task, workspace,
-	// owner). The daemon will inject this as MULTICA_TOKEN into the agent
+	// owner). The daemon will inject this as AGENTA_TOKEN into the agent
 	// process instead of its own credential, so any API call the agent
 	// makes — even one that strips X-Agent-ID / X-Task-ID headers — is
 	// recognized server-side as actor=agent, closing the lateral-movement

@@ -15,12 +15,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// CloudPATPrefix is the literal token prefix that identifies an mcn_
-// (Multica Cloud Node) PAT. Tokens with this prefix are validated by
-// calling the Multica Cloud Fleet service rather than by hitting our
-// local personal_access_tokens table — the cloud is the authoritative
-// owner of the token's lifecycle, status, and (owner_id, instance_id)
-// binding.
+
 const CloudPATPrefix = "mcn_"
 
 // cloudPATCachePrefix namespaces cloud-PAT cache keys away from
@@ -163,7 +158,7 @@ type OwnerLookupFunc func(ctx context.Context, ownerID string) (bool, error)
 // A nil *CloudPATVerifier is safe — Verify returns
 // ErrCloudPATNotConfigured. The Auth/DaemonAuth middlewares treat
 // "verifier nil" the same as "fleet URL empty", so a server with no
-// MULTICA_CLOUD_FLEET_URL configured simply rejects mcn_ tokens at
+// AGENTA_CLOUD_FLEET_URL configured simply rejects mcn_ tokens at
 // the prefix branch instead of nil-derefing.
 type CloudPATVerifier struct {
 	baseURL string
@@ -176,9 +171,6 @@ type CloudPATVerifier struct {
 // leaves room for future knobs (custom TTL, expected_owner_id binding)
 // without churning every call site.
 type CloudPATVerifierConfig struct {
-	// FleetBaseURL is the Cloud Fleet base URL (e.g.
-	// https://fleet.multica.cloud). Trailing slashes are trimmed.
-	// Empty disables the verifier — NewCloudPATVerifier returns nil.
 	FleetBaseURL string
 
 	// HTTPClient is the client used for verify calls. Optional —

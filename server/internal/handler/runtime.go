@@ -9,12 +9,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ezeslucky/agenta/server/internal/util"
+	"github.com/ezeslucky/agenta/server/pkg/agent"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
+	"github.com/ezeslucky/agenta/server/pkg/protocol"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/multica-ai/multica/server/internal/util"
-	"github.com/multica-ai/multica/server/pkg/agent"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
-	"github.com/multica-ai/multica/server/pkg/protocol"
 )
 
 type AgentRuntimeResponse struct {
@@ -32,7 +32,7 @@ type AgentRuntimeResponse struct {
 	// Visibility is "private" (default — only the owner / workspace admins
 	// can bind agents) or "public" (any workspace member can). See migration
 	// 083 and canUseRuntimeForAgent.
-	Visibility string  `json:"visibility"`
+	Visibility string `json:"visibility"`
 	// ProfileID is set when this runtime is an instance of a custom
 	// runtime_profile (MUL-3284); null for built-in runtimes.
 	ProfileID  *string `json:"profile_id"`

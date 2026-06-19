@@ -1,6 +1,6 @@
 # Squad Source Map
 
-This file records source evidence for `multica-squads/SKILL.md`.
+This file records source evidence for `agenta-squads/SKILL.md`.
 
 Use this when the task requires exact source paths, edge-case behavior, tests, or contract verification.
 
@@ -31,23 +31,23 @@ Key facts:
 Source:
 
 ```text
-server/cmd/multica/cmd_squad.go
+server/cmd/agenta/cmd_squad.go
 ```
 
 Commands:
 
 ```bash
-multica squad list
-multica squad get <squad-id>
-multica squad create
-multica squad update <squad-id>
-multica squad delete <squad-id>
-multica squad activity <issue-id> <outcome>
+agenta squad list
+agenta squad get <squad-id>
+agenta squad create
+agenta squad update <squad-id>
+agenta squad delete <squad-id>
+agenta squad activity <issue-id> <outcome>
 
-multica squad member list <squad-id>
-multica squad member add <squad-id>
-multica squad member remove <squad-id>
-multica squad member set-role <squad-id>
+agenta squad member list <squad-id>
+agenta squad member add <squad-id>
+agenta squad member remove <squad-id>
+agenta squad member set-role <squad-id>
 ```
 
 Use `--help` for exact flags before writes.

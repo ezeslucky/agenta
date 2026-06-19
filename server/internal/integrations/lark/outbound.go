@@ -8,11 +8,11 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/ezeslucky/agenta/server/internal/events"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
+	"github.com/ezeslucky/agenta/server/pkg/protocol"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/multica-ai/multica/server/internal/events"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
-	"github.com/multica-ai/multica/server/pkg/protocol"
 )
 
 // CardStatus mirrors lark_outbound_card_message.status. Kept as a typed
@@ -78,7 +78,7 @@ type defaultRenderer struct{}
 func NewDefaultRenderer() Renderer { return &defaultRenderer{} }
 
 func (defaultRenderer) Render(in RenderInput) (CardRender, error) {
-	header := "Multica"
+	header := "Agenta"
 	if in.AgentName != "" {
 		header = in.AgentName
 	}

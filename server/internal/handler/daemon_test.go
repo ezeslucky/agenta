@@ -13,14 +13,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ezeslucky/agenta/server/internal/auth"
+	"github.com/ezeslucky/agenta/server/internal/daemonws"
+	"github.com/ezeslucky/agenta/server/internal/middleware"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
+	"github.com/ezeslucky/agenta/server/pkg/protocol"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/multica-ai/multica/server/internal/auth"
-	"github.com/multica-ai/multica/server/internal/daemonws"
-	"github.com/multica-ai/multica/server/internal/middleware"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
-	"github.com/multica-ai/multica/server/pkg/protocol"
 )
 
 func TestLogClaimEndpointSlowIncludesPayloadFields(t *testing.T) {
@@ -2181,7 +2181,7 @@ func TestClaimTaskByRuntime_TaskWorkspaceMismatch_CancelsAndRejects(t *testing.T
 // comment, threaded under the trigger. Before the fix, CompleteTask exempted
 // comment-triggered tasks from the auto-synthesis path, so a Claude Code /
 // Codex / etc. agent that ended its run with only terminal text (no
-// `multica issue comment add` call) left the user staring at a "Completed"
+// `agenta issue comment add` call) left the user staring at a "Completed"
 // badge with no reply.
 func TestCompleteTask_CommentTriggered_SynthesizesCommentWhenAgentSilent(t *testing.T) {
 	if testHandler == nil {
@@ -3089,7 +3089,7 @@ func TestClaimTask_ChatPopulatesInitiator(t *testing.T) {
 	// A separate user stands in for the Lark group session creator (installer).
 	var installerID string
 	if err := testPool.QueryRow(ctx, `
-		INSERT INTO "user" (name, email) VALUES ('Installer User', 'installer-test@multica.ai')
+		INSERT INTO "user" (name, email) VALUES ('Installer User', 'installer-test@agenta.ai')
 		RETURNING id
 	`).Scan(&installerID); err != nil {
 		t.Fatalf("setup: create installer user: %v", err)
@@ -3531,7 +3531,7 @@ func installFreshMembershipCache(t *testing.T) {
 // deletes it on test cleanup. Returns the user id as a string.
 func createEphemeralUser(t *testing.T, label string) string {
 	t.Helper()
-	email := fmt.Sprintf("membership-cache-%s-%s@multica.ai", label, uuid.NewString())
+	email := fmt.Sprintf("membership-cache-%s-%s@agenta.ai", label, uuid.NewString())
 	var userID string
 	if err := testPool.QueryRow(context.Background(), `
 		INSERT INTO "user" (name, email) VALUES ($1, $2) RETURNING id

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"sort"
 
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 // TimelineEntry represents a single entry in the issue timeline, which can be
@@ -61,10 +61,7 @@ type timelinePaginatedResponse struct {
 // ListTimeline returns the full issue timeline (comments + activities merged).
 // Two response shapes coexist for boundary compatibility (#1929):
 //
-//   - No pagination params → flat ASC `TimelineEntry[]`. Matches the legacy
-//     desktop contract (Multica.app ≤ v0.2.25) and the new client.
-//   - Any of `limit` / `before` / `after` / `around` present → wrapped object
-//     with DESC entries + null cursors + has_more_*=false. Matches what a
+
 //     stale v0.2.26+ build expects when it parses the response with
 //     TimelinePageSchema; cursor-walking is now a no-op so the client just
 //     sees a single full page.

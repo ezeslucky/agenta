@@ -10,15 +10,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ezeslucky/agenta/server/internal/analytics"
+	"github.com/ezeslucky/agenta/server/internal/events"
+	"github.com/ezeslucky/agenta/server/internal/issueposition"
+	obsmetrics "github.com/ezeslucky/agenta/server/internal/metrics"
+	"github.com/ezeslucky/agenta/server/internal/util"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
+	"github.com/ezeslucky/agenta/server/pkg/protocol"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/multica-ai/multica/server/internal/analytics"
-	"github.com/multica-ai/multica/server/internal/events"
-	"github.com/multica-ai/multica/server/internal/issueposition"
-	obsmetrics "github.com/multica-ai/multica/server/internal/metrics"
-	"github.com/multica-ai/multica/server/internal/util"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
-	"github.com/multica-ai/multica/server/pkg/protocol"
 )
 
 // TxStarter abstracts transaction creation (satisfied by pgxpool.Pool).

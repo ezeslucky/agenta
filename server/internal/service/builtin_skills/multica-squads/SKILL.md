@@ -1,30 +1,30 @@
 ---
-name: multica-squads
-description: "Use when creating, inspecting, updating, assigning, mentioning, or debugging Multica squads. Explains what squads are, squad/member fields, CLI commands, leader routing, issue assignment, comments, mentions, autopilot behavior, leader briefing, side effects, and product-gap handling."
+name: agenta-squads
+description: "Use when creating, inspecting, updating, assigning, mentioning, or debugging Agenta squads. Explains what squads are, squad/member fields, CLI commands, leader routing, issue assignment, comments, mentions, autopilot behavior, leader briefing, side effects, and product-gap handling."
 user-invocable: false
-allowed-tools: Bash(multica *)
+allowed-tools: Bash(agenta *)
 ---
 
-# Multica Squads
+# Agenta Squads
 
 ## Quick start
 
 If debugging why a squad did or did not run, inspect first:
 
 ```bash
-multica issue get <issue-id> --output json
-multica squad get <squad-id> --output json
-multica squad member list <squad-id> --output json
-multica issue comment list <issue-id> --recent 20 --output json
+agenta issue get <issue-id> --output json
+agenta squad get <squad-id> --output json
+agenta squad member list <squad-id> --output json
+agenta issue comment list <issue-id> --recent 20 --output json
 ```
 
 If the command shape is unclear, check help instead of guessing:
 
 ```bash
-multica squad --help
-multica squad member --help
-multica issue update --help
-multica issue comment add --help
+agenta squad --help
+agenta squad member --help
+agenta issue update --help
+agenta issue comment add --help
 ```
 
 Do not assign, comment, mention, update, delete, or record squad activity just
@@ -32,7 +32,7 @@ to test. These can mutate workspace state or trigger agent runs.
 
 ## Core model
 
-A Multica squad is a workspace routing and coordination object.
+A Agenta squad is a workspace routing and coordination object.
 
 A squad is not an agent. It does not run work by itself. Current behavior:
 squad-routed work runs through the squad's `leader_id` agent.
@@ -50,26 +50,26 @@ Important consequences:
 Squad commands:
 
 ```bash
-multica squad list --output json
-multica squad get <squad-id> --output json
-multica squad create --name <name> --leader <agent-name-or-id> --output json
-multica squad update <squad-id> --instructions "<leader coordination policy>" --output json
-multica squad delete <squad-id>
+agenta squad list --output json
+agenta squad get <squad-id> --output json
+agenta squad create --name <name> --leader <agent-name-or-id> --output json
+agenta squad update <squad-id> --instructions "<leader coordination policy>" --output json
+agenta squad delete <squad-id>
 ```
 
 Member commands:
 
 ```bash
-multica squad member list <squad-id> --output json
-multica squad member add <squad-id> --member-id <id> --type agent|member --role <role> --output json
-multica squad member remove <squad-id> --member-id <id> --type agent|member
-multica squad member set-role <squad-id> --member-id <id> --member-type agent|member --role <role> --output json
+agenta squad member list <squad-id> --output json
+agenta squad member add <squad-id> --member-id <id> --type agent|member --role <role> --output json
+agenta squad member remove <squad-id> --member-id <id> --type agent|member
+agenta squad member set-role <squad-id> --member-id <id> --member-type agent|member --role <role> --output json
 ```
 
 Squad leader evaluation command:
 
 ```bash
-multica squad activity <issue-id> action|no_action|failed --reason "<why>" --output json
+agenta squad activity <issue-id> action|no_action|failed --reason "<why>" --output json
 ```
 
 `activity` is a write: it records the leader's evaluation decision on an issue.
@@ -78,10 +78,10 @@ Use it only when acting as the squad leader after evaluating a trigger.
 Issue/comment commands often needed with squads:
 
 ```bash
-multica issue get <issue-id> --output json
-multica issue update <issue-id> --help
-multica issue comment list <issue-id> --output json
-multica issue comment add <issue-id> --help
+agenta issue get <issue-id> --output json
+agenta issue update <issue-id> --help
+agenta issue comment list <issue-id> --output json
+agenta issue comment add <issue-id> --help
 ```
 
 Prefer `--output json` for reads. Use `--help` before writes.
@@ -130,7 +130,7 @@ the backend adds the new leader as a squad member with role `leader`.
 
 ## Leader briefing
 
-For squad leader tasks, Multica appends a squad leader briefing to the leader
+For squad leader tasks, Agenta appends a squad leader briefing to the leader
 agent instructions. The briefing includes:
 
 - Squad Operating Protocol;
@@ -223,7 +223,7 @@ These actions can trigger agent work or mutate durable state:
 - commenting on a squad-assigned issue;
 - mentioning a squad;
 - creating or triggering squad-assigned autopilots;
-- recording squad activity with `multica squad activity`;
+- recording squad activity with `agenta squad activity`;
 - deleting/archive squad.
 
 Do not perform side-effecting actions as tests unless the user explicitly

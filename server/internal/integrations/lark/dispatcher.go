@@ -7,10 +7,10 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/ezeslucky/agenta/server/internal/service"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/multica-ai/multica/server/internal/service"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 // InboundMessage is the normalized shape the WebSocket adapter hands
@@ -136,7 +136,7 @@ type DispatchResult struct {
 	IssueIdentifier string
 	// IssueTitle is the title the user supplied on /issue, echoed back
 	// in the confirmation message so the chat history reads naturally
-	// even when the Multica deep link is not reachable.
+	// even when the agenta deep link is not reachable.
 	IssueTitle string
 }
 
@@ -447,7 +447,7 @@ func (d *Dispatcher) processClaimed(ctx context.Context, msg InboundMessage, ins
 	//    won't cascade-delete when individual group members churn);
 	//    for p2p, the sender is the one and only human in the chat
 	//    so we use them.
-	sessionCreator := binding.MulticaUserID
+	sessionCreator := binding.AgentaUserID
 	if msg.ChatType == ChatTypeGroup {
 		sessionCreator = inst.InstallerUserID
 	}
@@ -479,7 +479,7 @@ func (d *Dispatcher) processClaimed(ctx context.Context, msg InboundMessage, ins
 	//    duplicate drop. finalizeNone — the other holder owns the row.
 	appendRes, err := d.Chat.AppendUserMessage(ctx, AppendUserMessageParams{
 		ChatSessionID:  sessionID,
-		Sender:         binding.MulticaUserID,
+		Sender:         binding.AgentaUserID,
 		Body:           msg.Body,
 		CommandBody:    msg.CommandBody,
 		InstallationID: inst.ID,
@@ -519,7 +519,7 @@ func (d *Dispatcher) processClaimed(ctx context.Context, msg InboundMessage, ins
 	//    above; from here all error returns must signal finalizeNone
 	//    (or finalizeMark in the defensive fallback above).
 	if appendRes.IssueCommand != nil {
-		issueRes, err := d.createIssueFromCommand(ctx, inst, binding.MulticaUserID, sessionID, *appendRes.IssueCommand)
+		issueRes, err := d.createIssueFromCommand(ctx, inst, binding.AgentaUserID, sessionID, *appendRes.IssueCommand)
 		if err != nil {
 			return DispatchResult{}, postAppendFinalize, fmt.Errorf("create issue from command: %w", err)
 		}
@@ -552,12 +552,12 @@ func (d *Dispatcher) processClaimed(ctx context.Context, msg InboundMessage, ins
 	//    Note: a daemon that's merely disconnected is NOT an error. As
 	//    long as agent.runtime_id is set, the chat task is enqueued at
 	//    flush and waits for the daemon to claim it on next online.
-	// binding.MulticaUserID is THIS message's sender — the task initiator. It is
+	// binding.agentaUserID is THIS message's sender — the task initiator. It is
 	// deliberately not the session creator (group sessions are creator=installer,
 	// see step 5). The debouncer keeps the latest scheduled flush per session, so
 	// in a multi-sender silence window the last sender wins, matching the
 	// "latest message in a window wins" rule above. See MUL-2645.
-	d.scheduleRun(inst, msg, sessionID, binding.MulticaUserID)
+	d.scheduleRun(inst, msg, sessionID, binding.AgentaUserID)
 	return res, postAppendFinalize, nil
 }
 

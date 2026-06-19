@@ -12,11 +12,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ezeslucky/agenta/server/internal/storage"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/multica-ai/multica/server/internal/storage"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 )
 
 // extContentTypes overrides http.DetectContentType for extensions it gets wrong.
@@ -70,8 +70,8 @@ type AttachmentResponse struct {
 	// chat messages). It is computed per deployment policy by
 	// buildMarkdownURL — preferring the storage URL when it is already a
 	// public, durable absolute URL (public CDN / LocalStorage with
-	// MULTICA_LOCAL_UPLOAD_BASE_URL), and otherwise prefixing
-	// MULTICA_PUBLIC_URL onto the stable per-attachment endpoint that the
+	// AGENTA_LOCAL_UPLOAD_BASE_URL), and otherwise prefixing
+	// AGENTA_PUBLIC_URL onto the stable per-attachment endpoint that the
 	// server self-resigns / proxies on every request.
 	//
 	// Why a separate field from URL / DownloadURL:
@@ -145,27 +145,27 @@ func attachmentDownloadPath(id string) string {
 //
 //  1. Persist `a.Url` only when the deployment has signaled the storage
 //     backend serves URLs publicly without per-request auth:
-//       - `Storage.CdnDomain()` is non-empty (operator configured a
-//         public-facing base URL — `S3_CDN_DOMAIN` for the S3 backend or
-//         `LOCAL_UPLOAD_BASE_URL` for LocalStorage), AND
-//       - `h.CFSigner` is nil (no per-request CloudFront signing — when
-//         signing is on, the same CDN domain serves PRIVATE content via
-//         time-bounded signed URLs and the raw `a.Url` is unauth-deny),
-//         AND
-//       - `a.Url` is itself an absolute http(s) URL with no signature
-//         query — defends against legacy rows backfilled while baseURL
-//         was unset, and against a freshly-signed `download_url` ever
-//         leaking into `a.Url` (the original MUL-3130 bug).
+//     - `Storage.CdnDomain()` is non-empty (operator configured a
+//     public-facing base URL — `S3_CDN_DOMAIN` for the S3 backend or
+//     `LOCAL_UPLOAD_BASE_URL` for LocalStorage), AND
+//     - `h.CFSigner` is nil (no per-request CloudFront signing — when
+//     signing is on, the same CDN domain serves PRIVATE content via
+//     time-bounded signed URLs and the raw `a.Url` is unauth-deny),
+//     AND
+//     - `a.Url` is itself an absolute http(s) URL with no signature
+//     query — defends against legacy rows backfilled while baseURL
+//     was unset, and against a freshly-signed `download_url` ever
+//     leaking into `a.Url` (the original MUL-3130 bug).
 //
 //  2. Every other shape — CloudFront-signed mode, S3 presign /proxy
 //     against a private bucket without a CDN domain, raw S3 / R2 /
 //     MinIO, LocalStorage with no `LOCAL_UPLOAD_BASE_URL` — uses the
 //     stable per-attachment endpoint that the server self-signs /
-//     proxies on every request, anchored on `MULTICA_PUBLIC_URL` so the
+//     proxies on every request, anchored on `AGENTA_PUBLIC_URL` so the
 //     persisted URL keeps working for clients that don't share the
 //     document origin (Desktop / mobile webview).
 //
-//  3. Last-resort fallback (no `MULTICA_PUBLIC_URL` configured): emit
+//  3. Last-resort fallback (no `AGENTA_PUBLIC_URL` configured): emit
 //     the site-relative path. Web's Next.js rewrite handles this; non-
 //     web clients on a deployment without `PublicURL` configured were
 //     already broken before MUL-3192 and stay broken here, but we
@@ -714,7 +714,7 @@ func shouldProxyAttachmentURL(rawURL string) bool {
 		return addr.IsLoopback() ||
 			addr.IsPrivate() ||
 			addr.IsLinkLocalUnicast() ||
-			addr.IsLinkLocalMulticast() ||
+			addr.IsLinkLocalAgentast() ||
 			addr.IsUnspecified()
 	}
 	return false

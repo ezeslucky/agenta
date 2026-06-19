@@ -1,17 +1,17 @@
 ---
-name: multica-working-on-issues
-description: "Use when working on a Multica issue after the runtime has provided the trigger context — to apply the product contracts the runtime brief does not encode: how PR linking differs from close intent, how to read a linked PR's real state via the pull-requests CLI, which metadata keys are high-signal, what status changes trigger on the server, and how sub-issue create status (todo vs backlog) controls whether assigned agents start immediately."
+name: agenta-working-on-issues
+description: "Use when working on a Agenta issue after the runtime has provided the trigger context — to apply the product contracts the runtime brief does not encode: how PR linking differs from close intent, how to read a linked PR's real state via the pull-requests CLI, which metadata keys are high-signal, what status changes trigger on the server, and how sub-issue create status (todo vs backlog) controls whether assigned agents start immediately."
 user-invocable: false
-allowed-tools: Bash(multica *), Bash(git *), Bash(gh *)
+allowed-tools: Bash(agenta *), Bash(git *), Bash(gh *)
 ---
 
-# Working on Multica issues
+# Working on Agenta issues
 
 Product contracts the runtime brief does not fully encode: PR linking vs close
 intent, reading linked-PR state, metadata keys, status side effects, and
 sub-issue enqueue behavior.
 
-For building mention links, load `multica-mentioning` instead — not this skill.
+For building mention links, load `agenta-mentioning` instead — not this skill.
 
 Every contract below is traced to source in
 `references/working-on-issues-source-map.md`.
@@ -23,7 +23,7 @@ same gate and they read different fields.
 
 **Linking** scans the PR **title, body, OR branch** for a routable issue key
 (`PREFIX-NUMBER`, e.g. `MUL-2759`). Each match writes an issue ↔ PR link row.
-This is the link that `multica issue pull-requests` reads back.
+This is the link that `agenta issue pull-requests` reads back.
 
 ```text
 MUL-2759: add built-in issue working skill        # title prefix → links
@@ -51,7 +51,7 @@ records close intent; on merge, that close intent can move the linked issue to
 ### Default for code-changing issue work
 
 When an issue run changes code in a checked-out GitHub repo, the default handoff
-is to open or update a PR before posting the final Multica issue comment, unless
+is to open or update a PR before posting the final Agenta issue comment, unless
 the user explicitly asked for a local-only change or no PR. This is a default, not
 an unconditional command: if no code changed, say no PR is needed; if PR creation
 is blocked by auth, failing tests, or missing remote state, report that blocker
@@ -72,12 +72,12 @@ that explicitly.
 
 ## Reading a linked PR's real state
 
-When a step depends on PR state, query Multica's link table — do not infer it
+When a step depends on PR state, query Agenta's link table — do not infer it
 from branch names, GitHub search, memory, or `pr_url` metadata (which can be
 stale).
 
 ```bash
-multica issue pull-requests <issue-id> --output json
+agenta issue pull-requests <issue-id> --output json
 ```
 
 Returns `{"pull_requests": [...]}`. Each element exposes:
@@ -121,8 +121,8 @@ Not metadata: logs, summaries, files touched, timestamps, attempt counts,
 investigation notes. Those belong in the result comment.
 
 ```bash
-multica issue metadata set <issue-id> --key pr_url --value <url>
-multica issue metadata delete <issue-id> --key <stale-key>
+agenta issue metadata set <issue-id> --key pr_url --value <url>
+agenta issue metadata delete <issue-id> --key <stale-key>
 ```
 
 `--value` is JSON-parsed by default (bool/number are sniffed); pass `--type
@@ -152,14 +152,14 @@ time; `backlog` sets the assignee without triggering.
 Parallel children — all start now:
 
 ```bash
-multica issue create --title "..." --parent <issue-id> --assignee <agent> --status todo
+agenta issue create --title "..." --parent <issue-id> --assignee <agent> --status todo
 ```
 
 Strictly serial children — park later steps, promote one at a time:
 
 ```bash
-multica issue create --title "Step 2: ..." --parent <issue-id> --assignee <agent> --status backlog
-multica issue status <child-id> todo   # promote when the previous step is truly done
+agenta issue create --title "Step 2: ..." --parent <issue-id> --assignee <agent> --status backlog
+agenta issue status <child-id> todo   # promote when the previous step is truly done
 ```
 
 Creating every serial step as `todo` enqueues the whole chain at once.
@@ -177,12 +177,12 @@ Serial sub-issues (don't start the whole chain):
 
 ```bash
 # incorrect — both fire immediately
-multica issue create --title "Step 2" --parent <issue-id> --assignee <agent> --status todo
-multica issue create --title "Step 3" --parent <issue-id> --assignee <agent> --status todo
+agenta issue create --title "Step 2" --parent <issue-id> --assignee <agent> --status todo
+agenta issue create --title "Step 3" --parent <issue-id> --assignee <agent> --status todo
 
 # correct — parked, promote in turn
-multica issue create --title "Step 2" --parent <issue-id> --assignee <agent> --status backlog
-multica issue create --title "Step 3" --parent <issue-id> --assignee <agent> --status backlog
+agenta issue create --title "Step 2" --parent <issue-id> --assignee <agent> --status backlog
+agenta issue create --title "Step 3" --parent <issue-id> --assignee <agent> --status backlog
 ```
 
 ## References

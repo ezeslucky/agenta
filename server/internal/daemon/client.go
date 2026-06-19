@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/multica-ai/multica/server/pkg/protocol"
+	"github.com/ezeslucky/agenta/server/pkg/protocol"
 )
 
 // requestError is returned by postJSON/getJSON when the server responds with an error status.
@@ -86,7 +86,7 @@ func isRuntimeNotFoundError(err error) bool {
 	return strings.Contains(strings.ToLower(reqErr.Body), "runtime not found")
 }
 
-// Client handles HTTP communication with the Multica server daemon API.
+
 type Client struct {
 	baseURL string
 	token   string
@@ -293,8 +293,8 @@ type (
 func (c *Client) SendHeartbeat(ctx context.Context, runtimeID string) (*HeartbeatResponse, error) {
 	var resp HeartbeatResponse
 	if err := c.postJSON(ctx, "/api/daemon/heartbeat", map[string]any{
-		"runtime_id":             runtimeID,
-		"supports_batch_import":  true,
+		"runtime_id":            runtimeID,
+		"supports_batch_import": true,
 	}, &resp); err != nil {
 		return nil, err
 	}

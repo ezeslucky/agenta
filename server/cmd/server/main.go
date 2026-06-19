@@ -11,17 +11,17 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ezeslucky/agenta/server/internal/analytics"
+	"github.com/ezeslucky/agenta/server/internal/daemonws"
+	"github.com/ezeslucky/agenta/server/internal/events"
+	"github.com/ezeslucky/agenta/server/internal/handler"
+	"github.com/ezeslucky/agenta/server/internal/logger"
+	obsmetrics "github.com/ezeslucky/agenta/server/internal/metrics"
+	"github.com/ezeslucky/agenta/server/internal/realtime"
+	"github.com/ezeslucky/agenta/server/internal/scheduler"
+	"github.com/ezeslucky/agenta/server/internal/service"
+	db "github.com/ezeslucky/agenta/server/pkg/db/generated"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/multica-ai/multica/server/internal/analytics"
-	"github.com/multica-ai/multica/server/internal/daemonws"
-	"github.com/multica-ai/multica/server/internal/events"
-	"github.com/multica-ai/multica/server/internal/handler"
-	"github.com/multica-ai/multica/server/internal/logger"
-	obsmetrics "github.com/multica-ai/multica/server/internal/metrics"
-	"github.com/multica-ai/multica/server/internal/realtime"
-	"github.com/multica-ai/multica/server/internal/scheduler"
-	"github.com/multica-ai/multica/server/internal/service"
-	db "github.com/multica-ai/multica/server/pkg/db/generated"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -43,7 +43,7 @@ func redisClientName(existing, suffix string) string {
 	if existing != "" {
 		return existing + ":" + suffix
 	}
-	return "multica-api:" + suffix
+	return "agenta-api:" + suffix
 }
 
 func closeRedisClient(label string, client *redis.Client) {
@@ -128,11 +128,11 @@ func main() {
 	if os.Getenv("RESEND_API_KEY") == "" && strings.TrimSpace(os.Getenv("SMTP_HOST")) == "" {
 		slog.Warn("no email backend configured (RESEND_API_KEY and SMTP_HOST both empty) — verification codes will be printed to the log instead of emailed.")
 	}
-	if os.Getenv("MULTICA_DEV_VERIFICATION_CODE") != "" {
+	if os.Getenv("AGENTA_DEV_VERIFICATION_CODE") != "" {
 		if strings.EqualFold(strings.TrimSpace(os.Getenv("APP_ENV")), "production") {
-			slog.Warn("MULTICA_DEV_VERIFICATION_CODE is set but ignored because APP_ENV=production.")
+			slog.Warn("AGENTA_DEV_VERIFICATION_CODE is set but ignored because APP_ENV=production.")
 		} else {
-			slog.Warn("MULTICA_DEV_VERIFICATION_CODE is enabled. Use it only for local development or private test instances.")
+			slog.Warn("AGENTA_DEV_VERIFICATION_CODE is enabled. Use it only for local development or private test instances.")
 		}
 	}
 
@@ -143,7 +143,7 @@ func main() {
 
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://multica:multica@localhost:5432/multica?sslmode=disable"
+		dbURL = "postgres://agenta:agenta@localhost:5432/agenta?sslmode=disable"
 	}
 
 	// Connect to database

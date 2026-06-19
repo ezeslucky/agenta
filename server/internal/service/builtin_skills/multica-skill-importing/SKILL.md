@@ -1,14 +1,14 @@
 ---
-name: multica-skill-importing
-description: "Use when a user provides a skill URL, slug, or clear intent to import/install a specific skill into the current Multica workspace. Teaches the workspace import API/CLI path (POST /api/skills/import), the supported URL source families, --on-conflict fail|overwrite|rename|skip behavior and structured import results, additive agent binding vs replace-all, and the reserved SKILL.md supporting-file rule. Do not use it to decide which skill the user needs, and never treat an external local installer like npx skills add as the final Multica install."
+name: agenta-skill-importing
+description: "Use when a user provides a skill URL, slug, or clear intent to import/install a specific skill into the current Agenta workspace. Teaches the workspace import API/CLI path (POST /api/skills/import), the supported URL source families, --on-conflict fail|overwrite|rename|skip behavior and structured import results, additive agent binding vs replace-all, and the reserved SKILL.md supporting-file rule. Do not use it to decide which skill the user needs, and never treat an external local installer like npx skills add as the final Agenta install."
 user-invocable: false
-allowed-tools: Bash(multica *)
+allowed-tools: Bash(agenta *)
 ---
 
-# Importing skills into Multica
+# Importing skills into Agenta
 
 Use this skill when the user already provided a skill URL, slug, or a clear intent
-to import a specific skill into the current Multica workspace.
+to import a specific skill into the current Agenta workspace.
 
 Do not use this skill to decide which skill the user needs. If the user only
 describes a capability and no URL is known, external search may produce candidate
@@ -20,12 +20,12 @@ Every claim below is traced to source in
 
 ## The invariant
 
-A skill is installed for Multica only when it exists in the current workspace's
+A skill is installed for Agenta only when it exists in the current workspace's
 skill database. The single supported path that puts it there is the workspace
 import endpoint, driven by this CLI:
 
 ```bash
-multica skill import --url <url> --output json
+agenta skill import --url <url> --output json
 ```
 
 The CLI defaults to `--on-conflict fail`. Current CLIs send:
@@ -36,19 +36,19 @@ body: { "url": "<url>", "on_conflict": "fail" }
 ```
 
 Do not finish with `npx skills add`. That installs into an external/local skill
-environment, not the Multica workspace DB, so Multica cannot manage or bind it.
+environment, not the Agenta workspace DB, so Agenta cannot manage or bind it.
 
 ## Supported URL source families
 
 `detectImportSource` accepts these hosts (and `www.` variants). Pass any of these
-forms to `multica skill import --url <url> --output json`:
+forms to `agenta skill import --url <url> --output json`:
 
 ```bash
-multica skill import --url clawhub.ai/owner/skill --output json
-multica skill import --url skills.sh/owner/repo/skill --output json
-multica skill import --url github.com/owner/repo --output json
-multica skill import --url github.com/owner/repo/tree/main/path/to/skill --output json
-multica skill import --url github.com/owner/repo/blob/main/path/to/SKILL.md --output json
+agenta skill import --url clawhub.ai/owner/skill --output json
+agenta skill import --url skills.sh/owner/repo/skill --output json
+agenta skill import --url github.com/owner/repo --output json
+agenta skill import --url github.com/owner/repo/tree/main/path/to/skill --output json
+agenta skill import --url github.com/owner/repo/blob/main/path/to/SKILL.md --output json
 ```
 
 - `clawhub.ai`, `skills.sh`, `github.com` are the recognized hosts.
@@ -63,7 +63,7 @@ multica skill import --url github.com/owner/repo/blob/main/path/to/SKILL.md --ou
 directly; search is not required by the API:
 
 ```bash
-multica skill import --url <url> --output json
+agenta skill import --url <url> --output json
 ```
 
 2. Treat the response as the source of truth. Current CLI imports use the
@@ -98,19 +98,19 @@ whether the import succeeded.
 assignments and appends the new id:
 
 ```bash
-multica agent skills add <agent-id> --skill-ids <skill-id> --output json
-multica agent skills list <agent-id> --output json
+agenta agent skills add <agent-id> --skill-ids <skill-id> --output json
+agenta agent skills list <agent-id> --output json
 ```
 
-After the final `multica agent skills list <agent-id> --output json`, verify the
+After the final `agenta agent skills list <agent-id> --output json`, verify the
 target skill id is present before claiming the skill is available to that agent.
 
 ## Additive add vs replace-all set
 
-`multica agent skills add` is additive: the server inserts the assignments without
+`agenta agent skills add` is additive: the server inserts the assignments without
 clearing existing ones (`AddAgentSkills`).
 
-`multica agent skills set` is replace-all: the server clears every current
+`agenta agent skills set` is replace-all: the server clears every current
 assignment, then re-adds exactly the ids you pass (`SetAgentSkills`).
 `set` is the replacement path. Passing only one id to `set` leaves the agent with
 only that one skill and drops every previous assignment.
@@ -133,7 +133,7 @@ for the primary skill content" — only fires on the dedicated single-file endpo
 
 ## Same-name conflicts: `--on-conflict`
 
-Default behavior is safe: `multica skill import --url <url>` is equivalent to
+Default behavior is safe: `agenta skill import --url <url>` is equivalent to
 `--on-conflict fail`. If the imported skill name already exists, the command
 prints a structured `conflict` result and exits non-zero; no skill is created or
 updated.
@@ -157,16 +157,16 @@ Concrete examples:
 
 ```bash
 # Safe default. Fails with status=conflict if review-helper already exists.
-multica skill import --url https://skills.sh/acme/repo/review-helper --output json
+agenta skill import --url https://skills.sh/acme/repo/review-helper --output json
 
 # Replace the existing same-name skill, preserving its ID and agent bindings.
-multica skill import --url https://skills.sh/acme/repo/review-helper --on-conflict overwrite --output json
+agenta skill import --url https://skills.sh/acme/repo/review-helper --on-conflict overwrite --output json
 
 # Keep the existing skill and import a copy such as review-helper-2.
-multica skill import --url https://skills.sh/acme/repo/review-helper --on-conflict rename --output json
+agenta skill import --url https://skills.sh/acme/repo/review-helper --on-conflict rename --output json
 
 # Batch-friendly behavior: leave the existing skill alone and mark it skipped.
-multica skill import --url https://skills.sh/acme/repo/review-helper --on-conflict skip --output json
+agenta skill import --url https://skills.sh/acme/repo/review-helper --on-conflict skip --output json
 ```
 
 Legacy compatibility: clients that do not send `on_conflict` keep the old
@@ -188,7 +188,7 @@ non-zero for the default `fail` strategy. Treat `existing_skill.id` and
 `existing_skill.name` as the source of truth, then fetch details if needed:
 
 ```bash
-multica skill get <skill-id> --output json
+agenta skill get <skill-id> --output json
 ```
 
 Older servers may return a `409` whose body is only a string like `a skill with
@@ -196,8 +196,8 @@ this name already exists`, with no `existing_skill` key. Recover by finding the
 existing workspace skill yourself:
 
 ```bash
-multica skill list --output json
-multica skill get <skill-id> --output json
+agenta skill list --output json
+agenta skill get <skill-id> --output json
 ```
 
 Then report that the skill already exists and include its `id` / `name`. Do not
@@ -206,13 +206,13 @@ dodge the conflict.
 
 ## Incorrect → correct
 
-Incorrect (bypasses Multica):
+Incorrect (bypasses Agenta):
 
 ```bash
 npx skills add https://skills.sh/owner/repo/skill
 ```
 
-The skill may exist locally, but Multica cannot manage it as a workspace skill.
+The skill may exist locally, but Agenta cannot manage it as a workspace skill.
 
 Incorrect agent binding for a normal add (replaces every existing assignment):
 
@@ -222,15 +222,15 @@ use `add`.
 Correct import:
 
 ```bash
-multica skill import --url https://skills.sh/owner/repo/skill --output json
+agenta skill import --url https://skills.sh/owner/repo/skill --output json
 ```
 
 Agent binding after import, when the caller intentionally wants to mutate that
 agent's skill assignments:
 
 ```bash
-multica agent skills add <agent-id> --skill-ids <skill-id> --output json
-multica agent skills list <agent-id> --output json
+agenta agent skills add <agent-id> --skill-ids <skill-id> --output json
+agenta agent skills list <agent-id> --output json
 ```
 
 ## References
