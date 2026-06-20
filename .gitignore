@@ -1,38 +1,70 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# Dependencies
 node_modules
-.pnp
-.pnp.js
+dist
+*.log
+.DS_Store
+.envrc
 
-# Local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# build outputs
+.turbo
+.next
+out
+build
+bin
+dist-electron
+*.tsbuildinfo
+# ...except electron-builder's source resources dir, which holds tracked
+# config files (entitlements, icons) — not build output.
+!apps/desktop/build/
+!apps/desktop/build/**
 
-# Testing
+# env
+.env*
+!.env.example
+# Desktop production config is public (backend URL, etc.) — track it so
+# `pnpm package` produces a release-ready build without extra setup.
+!apps/desktop/.env.production
+# Mobile staging config is public (staging API URL) — track it so a fresh
+# checkout can run `pnpm dev:mobile:staging` / `ios:mobile*:staging` without
+# the user having to copy `.env.example` first.
+!apps/mobile/.env.staging
+# Mobile production config is public (production API URL) — track it so
+# external users can run `pnpm ios:mobile:device:prod:release` against
+# agenta.ai's production backend without copying templates first.
+!apps/mobile/.env.production
+
+# test coverage
 coverage
 
-# Turbo
-.turbo
+# Go
+server/bin/
+server/tmp/
+server/migrate
+server/daemon
+server/agenta
 
-# Vercel
-.vercel
+# Test artifacts
+test-results/
+apps/web/test-results/
 
-# Build Outputs
-.next/
-out/
-build
-dist
+# context (agent workspace)
+.context
+.agent_context/
+.agenta/
 
+# local settings
+.claude/
+.tool-versions
 
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# feature tracking
+_features/
 
-# Misc
-.DS_Store
-*.pem
+# runtime
+*.pid
+
+# platform specific
+*.dmg
+*.app
+server/server
+data/
+.kilo
+.idea
