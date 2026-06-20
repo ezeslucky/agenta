@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-nova",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "styles/tokens.css",
+    "baseColor": "zinc",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@agenta/ui/components",
+    "ui": "@agenta/ui/components/ui",
+    "hooks": "@agenta/ui/hooks",
+    "lib": "@agenta/ui/lib",
+    "utils": "@agenta/ui/lib/utils"
+  }
+}
