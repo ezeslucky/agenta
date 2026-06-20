@@ -317,7 +317,7 @@ func GetBrewPrefix() string {
 	return strings.TrimSpace(string(out))
 }
 
-// UpdateViaBrew runs `brew upgrade agenta-ai/tap/agenta`.
+// UpdateViaBrew runs `brew upgrade ezeslucky/tap/agenta`.
 // Returns the combined output and any error.
 func UpdateViaBrew() (string, error) {
 	cmd := exec.Command("brew", "upgrade", "ezeslucky/tap/agenta")

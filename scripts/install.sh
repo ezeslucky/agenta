@@ -9,7 +9,7 @@ set -euo pipefail
 REPO_URL="https://github.com/ezeslucky/agenta.git"
 REPO_WEB_URL="https://github.com/ezeslucky/agenta"  # without .git, for GitHub web APIs
 INSTALL_DIR="${AGENTA_INSTALL_DIR:-$HOME/.agenta/server}"
-BREW_PACKAGE="agenta-ai/tap/agenta"
+BREW_PACKAGE="ezeslucky/tap/agenta"
 
 # Colors (disabled when not a terminal)
 if [ -t 1 ] || [ -t 2 ]; then
@@ -107,7 +107,7 @@ install_cli_brew() {
   info "Installing Agenta CLI via Homebrew..."
   local brew_log
   brew_log=$(mktemp)
-  if ! brew tap agenta-ai/tap >"$brew_log" 2>&1; then
+  if ! brew tap ezeslucky/tap >"$brew_log" 2>&1; then
     warn "Failed to add Homebrew tap. Falling back to GitHub Releases binary install."
     _dump_brew_log "$brew_log"
     rm -f "$brew_log"
