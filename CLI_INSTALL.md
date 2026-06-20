@@ -40,7 +40,7 @@ which brew
 If `brew` is found, install via Homebrew:
 
 ```bash
-brew install agenta-ai/tap/agenta
+brew install ezeslucky/tap/agenta
 ```
 
 Then verify:
@@ -54,7 +54,7 @@ If the version prints successfully, skip to **Step 3**.
 To upgrade later, run:
 
 ```bash
-brew upgrade agenta-ai/tap/agenta
+brew upgrade ezeslucky/tap/agenta
 ```
 
 ### Option B: Download from GitHub Releases (macOS/Linux, no Homebrew)
@@ -99,7 +99,7 @@ agenta version
 Run in PowerShell (no admin required):
 
 ```powershell
-irm https://raw.githubusercontent.com/agenta-ai/agenta/main/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/ezeslucky/agenta/main/scripts/install.ps1 | iex
 ```
 
 This downloads the latest Windows binary from GitHub Releases, installs it to `%USERPROFILE%\.agenta\bin\`, and adds it to your user PATH.
@@ -112,7 +112,7 @@ agenta version
 
 **If this fails:**
 - Restart your terminal so the updated PATH takes effect.
-- If you use Scoop, the installer will use it automatically: `scoop bucket add agenta https://github.com/agenta-ai/scoop-bucket.git && scoop install agenta`
+- If you use Scoop, the installer will use it automatically: `scoop bucket add agenta https://github.com/ezeslucky/scoop-bucket.git && scoop install agenta`
 - If your execution policy blocks the script: `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` then re-run.
 
 ---

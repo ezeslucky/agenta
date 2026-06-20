@@ -39,7 +39,7 @@ services:
       retries: 5
 
   backend:
-    image: ${AGENTA_BACKEND_IMAGE:-ghcr.io/agenta-ai/agenta-backend}:${AGENTA_IMAGE_TAG:-latest}
+    image: ${AGENTA_BACKEND_IMAGE:-ghcr.io/ezeslucky/agenta-backend}:${AGENTA_IMAGE_TAG:-latest}
     depends_on:
       postgres:
         condition: service_healthy
@@ -114,7 +114,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: ${AGENTA_WEB_IMAGE:-ghcr.io/agenta-ai/agenta-web}:${AGENTA_IMAGE_TAG:-latest}
+    image: ${AGENTA_WEB_IMAGE:-ghcr.io/ezeslucky/agenta-web}:${AGENTA_IMAGE_TAG:-latest}
     depends_on:
       - backend
     ports:

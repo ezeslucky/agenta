@@ -7,7 +7,7 @@ The `agenta` CLI connects your local machine to Agenta. It handles authenticatio
 ### Homebrew (macOS/Linux)
 
 ```bash
-brew install agenta-ai/tap/agenta
+brew install ezeslucky/tap/agenta
 ```
 
 ### Build from Source
@@ -22,7 +22,7 @@ cp server/bin/agenta /usr/local/bin/agenta
 ### Update
 
 ```bash
-brew upgrade agenta-ai/tap/agenta
+brew upgrade ezeslucky/tap/agenta
 ```
 
 For install script or manual installs, use:

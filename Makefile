@@ -93,14 +93,14 @@ selfhost: ## Create .env if needed, then pull and start the official self-hosted
 		echo "  Frontend: http://localhost:$${FRONTEND_PORT:-3000}"; \
 		echo "  Backend:  http://localhost:$${PORT:-8080}"; \
 		echo ""; \
-		echo "Images: $${AGENTA_BACKEND_IMAGE:-ghcr.io/agenta-ai/agenta-backend}:$${AGENTA_IMAGE_TAG:-latest}"; \
-		echo "        $${AGENTA_WEB_IMAGE:-ghcr.io/agenta-ai/agenta-web}:$${AGENTA_IMAGE_TAG:-latest}"; \
+		echo "Images: $${AGENTA_BACKEND_IMAGE:-ghcr.io/ezeslucky/agenta-backend}:$${AGENTA_IMAGE_TAG:-latest}"; \
+		echo "        $${AGENTA_WEB_IMAGE:-ghcr.io/ezeslucky/agenta-web}:$${AGENTA_IMAGE_TAG:-latest}"; \
 		echo ""; \
 		echo "Log in: configure RESEND_API_KEY in .env for email codes,"; \
 		echo "        or read the generated code from backend logs when Resend is unset."; \
 		echo ""; \
 		echo "Next — install the CLI and connect your machine:"; \
-		echo "  brew install agenta-ai/tap/agenta"; \
+		echo "  brew install ezeslucky/tap/agenta"; \
 		echo "  agenta setup self-host"; \
 	else \
 		echo ""; \
@@ -147,7 +147,7 @@ selfhost-build: ## Build backend/web from the current checkout and start the sel
 		echo "Local tags: agenta-backend:dev and agenta-web:dev."; \
 		echo ""; \
 		echo "Next — install the CLI and connect your machine:"; \
-		echo "  brew install agenta-ai/tap/agenta"; \
+		echo "  brew install ezeslucky/tap/agenta"; \
 		echo "  agenta setup self-host"; \
 	else \
 		echo ""; \
